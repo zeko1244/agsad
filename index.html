@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>برنامج الأقساط</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f766e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f5f6f8;--card:#fff;--tx:#1b1f24;--mut:#6b7280;--pri:#0f766e;--pri2:#e6f4f2;--bad:#c2410c;--bad2:#fdeee6;--bd:#e3e6ea}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12151a;--card:#1c2027;--tx:#eef0f3;--mut:#9aa3af;--pri:#14b8a6;--pri2:#16312f;--bad:#fb923c;--bad2:#3a2416;--bd:#2b313a}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#12151a;--card:#1c2027;--tx:#eef0f3;--mut:#9aa3af;--pri:#14b8a6;--pri2:#16312f;--bad:#fb923c;--bad2:#3a2416;--bd:#2b313a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Segoe UI",Tahoma,Arial,sans-serif;font-size:15px;padding:14px;max-width:600px;margin-inline:auto}
+h1{font-size:21px;margin:6px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:9px 4px;text-align:center}
+.stat small{color:var(--mut);display:block;font-size:11px}
+.stat b{font-size:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:10px}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+input,textarea{width:100%;padding:11px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font-size:15px;font-family:inherit}
+button,a.b{display:block;border:0;border-radius:10px;padding:11px;background:var(--pri);color:#fff;font-size:14px;font-family:inherit;text-decoration:none;cursor:pointer;text-align:center}
+.g{background:var(--pri2)!important;color:var(--pri)!important}
+.d{background:var(--bad2)!important;color:var(--bad)!important}
+.full{width:100%;margin-top:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.prev{background:var(--pri2);color:var(--pri);border-radius:10px;padding:10px;margin-top:12px;line-height:1.8}
+.top{display:flex;justify-content:space-between;align-items:start;gap:8px}
+.tag{font-size:12px;padding:3px 9px;border-radius:20px;background:var(--pri2);color:var(--pri);white-space:nowrap}
+.tag.late{background:var(--bad2);color:var(--bad)}
+.bar{height:7px;background:var(--bd);border-radius:5px;margin:10px 0;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--pri)}
+.acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.acts>*{flex:1;min-width:88px;padding:10px 4px}
+.m{color:var(--mut);font-size:14px;line-height:1.8}
+.big{font-size:18px;font-weight:700;color:var(--tx)}
+.hid{display:none}
+.tabs{display:flex;gap:6px;margin-bottom:10px}.tabs button{flex:1;padding:10px 2px}
+.kv{display:flex;justify-content:space-between;border-bottom:1px solid var(--bd);padding:6px 0;font-size:14px;gap:10px}
+.kv span:first-child{color:var(--mut);white-space:nowrap}
+h3{font-size:14px;margin:14px 0 4px}
+.ok{color:var(--pri)}.bd{color:var(--bad)}
+.fl{display:flex;gap:6px;margin-bottom:10px}.fl button{flex:1;padding:8px}
+</style>
+</head>
+<body>
+<div id="lock" class="hid" style="position:fixed;inset:0;z-index:99;background:var(--bg);padding:calc(env(safe-area-inset-top,0px) + 40px) 20px 20px"><h1>🔒 برنامج الأقساط</h1><input id="lp" type="password" inputmode="numeric" placeholder="الرقم السري"><button class="full" onclick="unlock()">دخول</button><div id="le" class="m" style="color:var(--bad)"></div></div>
+<h1>📱 برنامج الأقساط</h1>
+<div class="grid" id="stats"></div>
+<div class="tabs"><button id="t1" onclick="tab(1)">الزبائن</button><button id="t2" class="g" onclick="editId=null;tab(2)">＋ زبون جديد</button><button id="t4" class="g" onclick="tab(4)">التقرير</button><button id="t3" class="g" onclick="tab(3)">الإعدادات</button></div>
+
+<div id="list">
+<input id="q" placeholder="🔍 بحث بالاسم أو الرقم أو الموبايل" oninput="render()" style="margin-bottom:8px">
+<div class="fl"><button id="f0" onclick="flt(0)">الكل</button><button id="f1" class="g" onclick="flt(1)">المتأخرون</button><button id="f2" class="g" onclick="flt(2)">المسددون</button></div>
+<div id="cards"></div>
+</div>
+
+<div id="add" class="card hid">
+<label>اسم الزبون</label><input id="n">
+<div class="row"><div><label>رقم الهاتف</label><input id="p" inputmode="tel" placeholder="07701234567"></div>
+<div><label>العنوان</label><input id="ad"></div></div>
+<div class="row"><div><label>اسم الكفيل</label><input id="kn"></div>
+<div><label>هاتف الكفيل</label><input id="kp" inputmode="tel"></div></div>
+<div class="row"><div><label>نوع الموبايل</label><input id="it"></div>
+<div><label>رقم IMEI</label><input id="im" inputmode="numeric"></div></div>
+<div class="row"><div><label>سعر شرائك (دينار)</label><input id="c" inputmode="numeric" value="600000" oninput="calc()"></div>
+<div><label>نسبة الربح %</label><input id="pc" inputmode="decimal" value="25" oninput="calc()"></div></div>
+<div class="row"><div><label>المقدمة (دينار)</label><input id="dn" inputmode="numeric" value="0" oninput="calc()"></div>
+<div><label>القسط الشهري (دينار)</label><input id="mo" inputmode="numeric" value="50000" oninput="calc()"></div></div>
+<label>تاريخ البداية</label><input id="st" type="date">
+<label>ملاحظات</label><textarea id="nt" rows="2"></textarea>
+<div class="prev" id="pv"></div>
+<div id="err" class="m" style="color:var(--bad)"></div>
+<button class="full" id="sb" onclick="save()">حفظ الزبون</button>
+</div>
+
+<div id="rep" class="hid"><label>اختر الشهر</label><input id="rm" type="month" oninput="rpt()"><div id="rbody"></div></div>
+<div id="set" class="card hid">
+<label>رأس المال الكلي (دينار)</label><input id="cap" inputmode="numeric" oninput="setCap()">
+<h3>☁️ الحفظ أونلاين</h3><div class="m" id="sy">جاري الاتصال...</div><h3>🔒 الرقم السري</h3><input id="pn" type="password" inputmode="numeric" placeholder="رقم سري (4 أرقام أو أكثر)"><div class="acts"><button class="g" onclick="setPin()">حفظ الرقم السري</button><button class="d" onclick="noPin()">إزالة</button></div><div id="pm" class="m"></div><h3>نسخة احتياطية</h3>
+<div class="m">اضغط تصدير، انسخ النص واحفظه في ملاحظات أو أرسله لنفسك. للاسترجاع الصق النص واضغط استيراد.</div>
+<textarea id="bk" rows="4"></textarea>
+<div class="acts"><button class="g" onclick="exp()">تصدير</button><button class="g" onclick="imp()">استيراد</button></div>
+<div id="bm" class="m"></div>
+<div class="m" style="margin-top:10px">البيانات محفوظة داخل متصفح هذا الجهاز، فلا تمسح بيانات المتصفح.</div>
+</div>
+
+<script>
+var D={cap:2000000,pc:25,cus:[],pin:'',ts:0};
+try{var s=localStorage.getItem('aqsat3')||localStorage.getItem('aqsat2');if(s){var o=JSON.parse(s);D.cap=o.cap||D.cap;D.pc=o.pc||25;D.cus=o.cus||[];D.pin=o.pin||'';D.ts=o.ts||0}}catch(e){}
+function sv(){D.ts=Date.now();try{localStorage.setItem('aqsat3',JSON.stringify(D))}catch(e){}push()}
+var $=function(i){return document.getElementById(i)};
+var f=function(n){return Math.round(n).toLocaleString('en-US')};
+var openPay=null,delAsk=null,ex={},fl=0,editId=null,unlocked=false,dbDoc=null,pt=null,sy='جاري الاتصال...';
+function today(){return new Date().toISOString().slice(0,10)}
+function tab(t){$('list').classList.toggle('hid',t!=1);$('add').classList.toggle('hid',t!=2);$('set').classList.toggle('hid',t!=3);$('rep').classList.toggle('hid',t!=4);
+for(var i=1;i<5;i++)$('t'+i).className=i==t?'':'g';if(t==2){if(editId)fillEdit();else{clearForm();$('pc').value=D.pc;$('st').value=today();calc()}}else editId=null;if(t==3){$('cap').value=D.cap;syStat()}if(t==4){if(!$('rm').value)$('rm').value=today().slice(0,7);rpt()}}
+function flt(k){fl=k;for(var i=0;i<3;i++)$('f'+i).className=i==k?'':'g';render()}
+function addM(d,k){var x=new Date(d);x.setMonth(x.getMonth()+k);return x}
+function fd(d){return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()}
+function plan(c,pc,dn,mon){var tot=c*(1+pc/100);var base=Math.max(0,tot-dn);mon=Math.max(mon,1);var mo=Math.max(1,Math.ceil(base/mon-1e-9));return{tot:tot,base:base,mon:mon,mo:mo,profit:tot-c}}
+function calc(){var c=+$('c').value||0,pc=+$('pc').value||0,dn=+$('dn').value||0,mn=+$('mo').value||50000;var r=plan(c,pc,dn,mn),mo=r.mo;
+$('pv').innerHTML='السعر بالأقساط: <b>'+f(r.tot)+'</b><br>ربحك: <b>'+f(r.profit)+'</b><br>بعد المقدمة يبقى: <b>'+f(r.base)+'</b><br>القسط الشهري: <b>'+f(r.mon)+'</b><br>عدد الأقساط (الأشهر): <b>'+mo+'</b>'+(mo>1?'<br>القسط الأخير: <b>'+f(Math.max(0,r.base-r.mon*(mo-1)))+'</b>':'')}
+function save(){var n=$('n').value.trim();if(!n){$('err').textContent='اكتب اسم الزبون';return}$('err').textContent='';
+var c=+$('c').value||0,pc=+$('pc').value||0,dn=+$('dn').value||0,mn=+$('mo').value||50000,st=$('st').value||today();var r=plan(c,pc,dn,mn),mo=r.mo;D.pc=pc;
+var obj={id:Date.now(),n:n,p:$('p').value.trim(),ad:$('ad').value.trim(),kn:$('kn').value.trim(),kp:$('kp').value.trim(),it:$('it').value.trim()||'موبايل',im:$('im').value.trim(),nt:$('nt').value.trim(),
+c:c,pcn:pc,dn:dn,mo:mo,tot:r.tot,mon:r.mon,st:st,paid:dn,pays:dn>0?[{d:st,a:dn,t:'مقدمة'}]:[]};if(editId){var o=find(editId);obj.id=o.id;obj.pays=(o.pays||[]).filter(function(p){return p.t!='مقدمة'});if(dn>0)obj.pays.unshift({d:st,a:dn,t:'مقدمة'});obj.paid=o.paid-(o.dn||0)+dn;D.cus[D.cus.indexOf(o)]=obj}else D.cus.push(obj);editId=null;
+sv();['n','p','ad','kn','kp','it','im','nt'].forEach(function(i){$(i).value=''});tab(1);render()}
+function info(x){var dn=x.dn||0,base=Math.max(0,x.tot-dn),cum=[],sch=[],now=new Date(),paid=x.paid,k=0,due=0,next=null,firstLate=null;
+for(var i=1;i<=x.mo;i++){var c=i==x.mo?x.tot:Math.min(x.tot,dn+x.mon*i);cum.push(c);var dt=addM(x.st,i);var cov=paid>=c-0.5;var st=cov?'ok':(dt<=now?'late':'up');
+sch.push({i:i,d:dt,a:c-(i>1?cum[i-2]:dn),s:st});if(cov)k=i;if(dt<=now)due=i;if(!cov&&!next)next=dt;if(st=='late'&&!firstLate)firstLate=dt}
+var exp=due>0?cum[due-1]:dn;var late=Math.max(0,Math.min(exp,x.tot)-paid);var rem=Math.max(0,x.tot-paid);
+return{rem:rem,late:late,next:rem<=0?null:next,done:rem<=0,sch:sch,days:firstLate&&late>0?Math.floor((now-firstLate)/864e5):0,end:addM(x.st,x.mo)}}
+function phone(p){p=(p||'').replace(/\D/g,'');if(p.indexOf('964')==0)return p;if(p.charAt(0)=='0')p=p.slice(1);return '964'+p}
+function msg(x,t){var i=info(x);var nm='السلام عليكم '+x.n+'، ';
+if(t=='r')return nm+'تذكير بقسط '+x.it+' بمبلغ '+f(Math.min(x.mon,i.rem))+' دينار'+(i.next?' موعده '+fd(i.next):'')+'. المتبقي عليك '+f(i.rem)+' دينار. شكراً لتعاونك.';
+if(t=='l')return nm+'نذكرك بأن عليك مبلغ متأخر '+f(i.late)+' دينار لقسط '+x.it+' ('+i.days+' يوم تأخير). المتبقي الكلي '+f(i.rem)+' دينار. نرجو التسديد بأقرب وقت.';
+return nm+'تم استلام دفعتك. المتبقي عليك '+f(i.rem)+' دينار'+(i.done?' (تم التسديد بالكامل، شكراً لك)':'')+'.'}
+function wa(x,t){return 'https://wa.me/'+phone(x.p)+'?text='+encodeURIComponent(msg(x,t))}
+function sms(x,t){return 'sms:'+(x.p||'')+'?body='+encodeURIComponent(msg(x,t))}
+function find(id){return D.cus.find(function(y){return y.id==id})}
+function showPay(id){openPay=id;delAsk=null;render()}
+function doPay(id){var v=+$('pa'+id).value;if(!v||v<=0)return;var x=find(id);x.pays=x.pays||[];x.pays.push({d:$('pd'+id).value||today(),a:v});x.paid+=v;sv();openPay=null;render()}
+function undo(id){var x=find(id);if(!x.pays||!x.pays.length)return;var l=x.pays.pop();x.paid-=l.a;sv();render()}
+function del(id){if(delAsk==id){D.cus=D.cus.filter(function(y){return y.id!=id});delAsk=null;sv()}else{delAsk=id;openPay=null}render()}
+function tg(id){ex[id]=!ex[id];render()}
+function setCap(){D.cap=+$('cap').value||0;sv();render()}
+function exp(){$('bk').value=JSON.stringify(D);$('bm').textContent='انسخ النص أعلاه واحفظه.'}
+function imp(){try{var o=JSON.parse($('bk').value);if(!o.cus)throw 0;D=o;sv();render();$('bm').textContent='تم الاستيراد ✓'}catch(e){$('bm').textContent='النص غير صالح.'}}
+function esc(s){return String(s||'').replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+function kv(a,b){return b?'<div class="kv"><span>'+a+'</span><span>'+esc(b)+'</span></div>':''}
+function render(){
+var out=0,pr=0,late=0,inv=0,col=0,done=0;
+D.cus.forEach(function(x){var i=info(x);out+=i.rem;pr+=x.tot-x.c;inv+=x.c;col+=x.paid;if(i.done)done++;else if(i.late>0)late++});
+function st(a,b,c){return '<div class="stat"><small>'+a+'</small><b'+(c?' style="color:var(--bad)"':'')+'>'+b+'</b></div>'}
+$('stats').innerHTML=st('رأس المال',f(D.cap))+st('السيولة المتوفرة',f(D.cap-inv+col))+st('مستثمر بالموبايلات',f(inv))+st('المتبقي عند الزبائن',f(out))+st('الربح المتوقع',f(pr))+st('المحصّل',f(col))+st('عدد الزبائن',D.cus.length)+st('مسددون',done)+st('متأخرون',late,1);
+var q=($('q').value||'').trim().toLowerCase(),h='';
+D.cus.slice().reverse().forEach(function(x){var i=info(x);
+if(q&&(x.n+' '+x.p+' '+x.it).toLowerCase().indexOf(q)<0)return;
+if(fl==1&&!(i.late>0&&!i.done))return;if(fl==2&&!i.done)return;
+var pc=Math.min(100,x.paid/x.tot*100);
+h+='<div class="card"><div class="top"><div><b style="font-size:16px">'+esc(x.n)+'</b><div class="m">'+esc(x.it)+(x.p?' · '+esc(x.p):'')+'</div></div>'+
+(i.done?'<span class="tag">مسدد ✓</span>':i.late>0?'<span class="tag late">متأخر '+i.days+' يوم</span>':'<span class="tag">منتظم</span>')+'</div>'+
+'<div class="bar"><i style="width:'+pc+'%"></i></div>'+
+'<div class="m">المتبقي: <span class="big">'+f(i.rem)+'</span> من '+f(x.tot)+'<br>المدفوع '+f(x.paid)+' · القسط '+f(x.mon)+(i.late>0&&!i.done?'<br><span class="bd">مبلغ متأخر: '+f(i.late)+'</span>':'')+(i.next?'<br>القسط القادم: '+fd(i.next):'')+'</div>';
+if(openPay==x.id){h+='<div class="row"><div><label>المبلغ</label><input id="pa'+x.id+'" inputmode="numeric" value="'+Math.min(x.mon,i.rem)+'"></div><div><label>التاريخ</label><input id="pd'+x.id+'" type="date" value="'+today()+'"></div></div><div class="acts"><button onclick="doPay('+x.id+')">تأكيد التسديد</button><button class="g" onclick="openPay=null;render()">إلغاء</button></div>'}
+else{h+='<div class="acts">'+(i.done?'':'<button onclick="showPay('+x.id+')">＋ تسديد</button>')+'<button class="g" onclick="tg('+x.id+')">'+(ex[x.id]?'إخفاء التفاصيل':'التفاصيل')+'</button><button class="g" onclick="edit('+x.id+')">تعديل</button><button class="d" onclick="del('+x.id+')">'+(delAsk==x.id?'تأكيد الحذف؟':'حذف')+'</button></div>'}
+if(x.p){h+='<div class="acts">'+(i.done?'':'<a class="b g" target="_blank" href="'+wa(x,'r')+'">تذكير واتساب</a><a class="b g" href="'+sms(x,'r')+'">تذكير SMS</a>')+(i.late>0&&!i.done?'<a class="b d" target="_blank" href="'+wa(x,'l')+'">تنبيه تأخير</a>':'')+'<a class="b g" target="_blank" href="'+wa(x,'p')+'">رسالة استلام</a></div>'}
+if(ex[x.id]){h+='<h3>معلومات الزبون</h3>'+kv('العنوان',x.ad)+kv('الكفيل',x.kn)+kv('هاتف الكفيل',x.kp)+kv('IMEI',x.im)+kv('ملاحظات',x.nt)+
+'<h3>تفاصيل الصفقة</h3>'+kv('سعر الشراء',f(x.c))+kv('نسبة الربح',(x.pcn||'')+'%')+kv('السعر بالأقساط',f(x.tot))+kv('ربحك',f(x.tot-x.c))+kv('المقدمة',f(x.dn||0))+kv('عدد الأشهر',x.mo)+kv('القسط الشهري',f(x.mon))+kv('تاريخ البداية',fd(new Date(x.st)))+kv('تاريخ الانتهاء',fd(i.end))+
+'<h3>جدول الأقساط</h3>';
+i.sch.forEach(function(r){h+='<div class="kv"><span>قسط '+r.i+' · '+fd(r.d)+'</span><span class="'+(r.s=='ok'?'ok':r.s=='late'?'bd':'')+'">'+f(r.a)+' '+(r.s=='ok'?'✓ مسدد':r.s=='late'?'متأخر':'قادم')+'</span></div>'});
+h+='<h3>سجل الدفعات</h3>';var ps=x.pays||[];
+if(!ps.length)h+='<div class="m">لا توجد دفعات مسجلة.</div>';
+ps.forEach(function(p){h+='<div class="kv"><span>'+esc(p.d)+(p.t?' · '+p.t:'')+'</span><span>'+f(p.a)+'</span></div>'});
+if(ps.length)h+='<div class="acts"><button class="d" onclick="undo('+x.id+')">تراجع عن آخر دفعة</button></div>'}
+h+='</div>'});
+$('cards').innerHTML=h||'<div class="card m">لا توجد نتائج. اضغط ＋ زبون جديد.</div>'}
+function edit(id){editId=id;tab(2)}
+function clearForm(){['n','p','ad','kn','kp','it','im','nt'].forEach(function(i){$(i).value=''});$('c').value=600000;$('dn').value=0;$('mo').value=50000;$('sb').textContent='حفظ الزبون';$('err').textContent=''}
+function fillEdit(){var x=find(editId);if(!x){editId=null;return}var m={n:x.n,p:x.p,ad:x.ad,kn:x.kn,kp:x.kp,it:x.it,im:x.im,nt:x.nt,c:x.c,pc:x.pcn,dn:x.dn||0,mo:x.mon,st:x.st};for(var k in m)$(k).value=m[k]==null?'':m[k];$('sb').textContent='حفظ التعديلات';$('err').textContent='';calc()}
+function sc(a,b,c){return '<div class="stat"><small>'+a+'</small><b'+(c?' style="color:var(--bad)"':'')+'>'+b+'</b></div>'}
+function rpt(){var m=$('rm').value;if(!m)return;var col=0,ex2=0,prof=0,np=0,nc=0,ni=0,npf=0,rows='',lt='';
+D.cus.forEach(function(x){var i=info(x),cl=0;(x.pays||[]).forEach(function(p){if((p.d||'').slice(0,7)==m){cl+=p.a;np++}});
+if(cl>0){col+=cl;prof+=cl*(x.tot-x.c)/x.tot;rows+='<div class="kv"><span>'+esc(x.n)+'</span><span>'+f(cl)+'</span></div>'}
+i.sch.forEach(function(r){var k=r.d.getFullYear()+'-'+('0'+(r.d.getMonth()+1)).slice(-2);if(k==m)ex2+=r.a});
+if((x.st||'').slice(0,7)==m){nc++;ni+=x.c;npf+=x.tot-x.c}
+if(!i.done&&i.late>0)lt+='<div class="kv"><span>'+esc(x.n)+' · '+i.days+' يوم</span><span class="bd">'+f(i.late)+'</span></div>'});
+$('rbody').innerHTML='<div class="grid" style="margin-top:10px">'+sc('المحصّل',f(col))+sc('المستحق بالأقساط',f(ex2))+sc('ربح المحصّل (تقديري)',f(prof))+'</div><div class="grid">'+sc('عدد الدفعات',np)+sc('مبيعات جديدة',nc)+sc('رأس مال مستثمر',f(ni))+'</div>'+(nc?'<div class="m">الربح المتوقع من مبيعات هذا الشهر: '+f(npf)+'</div>':'')+'<div class="card" style="margin-top:10px"><b>التحصيل حسب الزبون</b>'+(rows||'<div class="m">لا توجد دفعات بهذا الشهر.</div>')+'<div class="m">المحصّل يشمل المقدمات.</div></div><div class="card"><b>المتأخرون حالياً</b>'+(lt||'<div class="m">لا يوجد متأخرون ✓</div>')+'</div>'}
+function hp(s){var h=5381;s='aq'+s;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return ''+h}
+function checkLock(){if(D.pin&&!unlocked)$('lock').classList.remove('hid');else $('lock').classList.add('hid')}
+function unlock(){if(hp($('lp').value)==D.pin){unlocked=true;$('lp').value='';$('le').textContent='';checkLock()}else $('le').textContent='الرقم السري غلط'}
+function setPin(){var v=$('pn').value;if(!/^\d{4,}$/.test(v)){$('pm').textContent='اكتب 4 أرقام على الأقل';return}D.pin=hp(v);unlocked=true;sv();$('pn').value='';$('pm').textContent='تم حفظ الرقم السري ✓'}
+function noPin(){D.pin='';sv();$('pm').textContent='تمت إزالة الرقم السري.'}
+function syStat(m){if(m)sy=m;if($('sy'))$('sy').textContent=sy}
+function push(){if(!dbDoc)return;clearTimeout(pt);pt=setTimeout(function(){dbDoc.set({j:JSON.stringify(D),ts:D.ts}).then(function(){syStat('☁️ محفوظ أونلاين')}).catch(function(){syStat('تعذر الحفظ أونلاين، البيانات محفوظة على الجهاز')})},1200)}
+async function initSync(){try{var db=await window.claude.use('db'),us=await window.claude.use('user');if(!db||!us){syStat('الحفظ أونلاين غير متاح هنا، البيانات محفوظة على الجهاز فقط.');return}
+var id=await us.id();if(!id){syStat('سجّل دخولك بحساب Claude حتى يشتغل الحفظ أونلاين.');return}dbDoc=db.doc('data/users/'+id+'/main');var s=await dbDoc.get();
+if(s.exists){var r=JSON.parse(s.data().j);if((r.ts||0)>(D.ts||0)){D=r;D.cus=D.cus||[];try{localStorage.setItem('aqsat3',JSON.stringify(D))}catch(e){}checkLock();render();syStat('☁️ تم تحميل بياناتك من الحفظ أونلاين')}else push()}else push();if(sy=='جاري الاتصال...')syStat('☁️ متصل')}catch(e){syStat('الحفظ أونلاين غير متاح هنا، البيانات محفوظة على الجهاز فقط.')}}
+tab(1);render();checkLock();initSync();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
+</script>
+</body>
+</html>
